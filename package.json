@@ -12,7 +12,9 @@
   "author": "LuHenriSouza",
   "license": "ISC",
   "dependencies": {
+    "@types/node": "^20.10.4",
     "axios": "^1.6.2",
-    "fs": "^0.0.1-security"
+    "fs": "^0.0.1-security",
+    "ts-node": "^10.9.2"
   }
 }
