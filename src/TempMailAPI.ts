@@ -7,9 +7,9 @@ class TempMailAPI {
     private domain: any;
     public address: string;
 
-    constructor(name: string | null = null) {
+    constructor(name: string | null = null, domain: string | null = null) {
         this.name = name ? name : this.generateRandomString();
-        this.domain = '';
+        this.domain = domain ? domain : '';
     }
 
     private generateMD5Hash(data: string): string {
@@ -19,8 +19,10 @@ class TempMailAPI {
     }
 
     public async init(): Promise<void> {
-        const randomDomain = await this.getDomain();
-        this.domain = randomDomain;
+        if (this.domain === '') {
+            const randomDomain = await this.getDomain();
+            this.domain = randomDomain;
+        }
 
         this.address = this.name + this.domain;
         this.md5address = this.generateMD5Hash(this.address);
@@ -36,7 +38,7 @@ class TempMailAPI {
         return string;
     }
 
-    private async getDomain(): Promise<string> {
+    private async getDomain() {
 
         const options = {
             method: 'GET',
@@ -57,12 +59,33 @@ class TempMailAPI {
                 throw new Error('A resposta da API não contém domínios válidos.');
             }
         } catch (error) {
-            return error;
+            console.error("getDomainError: " + error);
+            return;
         }
     }
 
-    private getEmails() {
+    public async getEmails() {
+        if (this.md5address) {
+            const options = {
+                method: 'GET',
+                url: 'https://privatix-temp-mail-v1.p.rapidapi.com/request/mail/id/' + this.md5address + '/',
+                headers: {
+                    'X-RapidAPI-Key': '5cdcb6428dmshc5fbda396a832c8p1a1e08jsnfc9bc7908b1e',
+                    'X-RapidAPI-Host': 'privatix-temp-mail-v1.p.rapidapi.com'
+                }
+            };
 
+            try {
+                const response = await axios.request(options);
+                console.log(response.data);
+                return response.data;
+            } catch (error) {
+                console.error("getEmailsError: " + error);
+                return;
+            }
+        }else{
+            console.error("getEmailsError: " + "'md5address' not found, try using init() before getEmails()")
+        }
     }
 }
 

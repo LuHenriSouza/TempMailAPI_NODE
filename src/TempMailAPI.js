@@ -39,10 +39,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var axios_1 = require("axios");
 var crypto = require("crypto");
 var TempMailAPI = /** @class */ (function () {
-    function TempMailAPI(name) {
+    function TempMailAPI(name, domain) {
         if (name === void 0) { name = null; }
+        if (domain === void 0) { domain = null; }
         this.name = name ? name : this.generateRandomString();
-        this.domain = '';
+        this.domain = domain ? domain : '';
     }
     TempMailAPI.prototype.generateMD5Hash = function (data) {
         var hash = crypto.createHash('md5');
@@ -54,10 +55,14 @@ var TempMailAPI = /** @class */ (function () {
             var randomDomain;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.getDomain()];
+                    case 0:
+                        if (!(this.domain === '')) return [3 /*break*/, 2];
+                        return [4 /*yield*/, this.getDomain()];
                     case 1:
                         randomDomain = _a.sent();
                         this.domain = randomDomain;
+                        _a.label = 2;
+                    case 2:
                         this.address = this.name + this.domain;
                         this.md5address = this.generateMD5Hash(this.address);
                         return [2 /*return*/, Promise.resolve()];
@@ -105,13 +110,48 @@ var TempMailAPI = /** @class */ (function () {
                         return [3 /*break*/, 4];
                     case 3:
                         error_1 = _a.sent();
-                        return [2 /*return*/, error_1];
+                        console.error("getDomainError: " + error_1);
+                        return [2 /*return*/];
                     case 4: return [2 /*return*/];
                 }
             });
         });
     };
     TempMailAPI.prototype.getEmails = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var options, response, error_2;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!this.md5address) return [3 /*break*/, 5];
+                        options = {
+                            method: 'GET',
+                            url: 'https://privatix-temp-mail-v1.p.rapidapi.com/request/mail/id/' + this.md5address + '/',
+                            headers: {
+                                'X-RapidAPI-Key': '5cdcb6428dmshc5fbda396a832c8p1a1e08jsnfc9bc7908b1e',
+                                'X-RapidAPI-Host': 'privatix-temp-mail-v1.p.rapidapi.com'
+                            }
+                        };
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, axios_1.default.request(options)];
+                    case 2:
+                        response = _a.sent();
+                        console.log(response.data);
+                        return [2 /*return*/, response.data];
+                    case 3:
+                        error_2 = _a.sent();
+                        console.error("getEmailsError: " + error_2);
+                        return [2 /*return*/];
+                    case 4: return [3 /*break*/, 6];
+                    case 5:
+                        console.error("getEmailsError: " + "'md5address' not found, try using init() before getEmails()");
+                        _a.label = 6;
+                    case 6: return [2 /*return*/];
+                }
+            });
+        });
     };
     return TempMailAPI;
 }());
