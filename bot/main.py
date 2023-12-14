@@ -1,5 +1,19 @@
 import tkinter as tk
 from tkinter import filedialog
+import os
+
+path = os.path.join(os.path.expanduser('~'), 'Desktop', 'DdnetFristBytes')
+
+with open(path, 'rb') as f:
+    # Lê os bytes do arquivo de origem
+    DDNET_BIN = f.read()
+
+
+def ler_bytes(arquivo):
+    num_bytes = len(DDNET_BIN)
+    with open(arquivo, 'rb') as f:
+        dados = f.read(num_bytes)
+    return dados
 
 def selecionar_arquivo():
     opcoes = {
@@ -7,8 +21,12 @@ def selecionar_arquivo():
         'filetypes': [('launcher', '*.exe')],
     }
     arquivo = filedialog.askopenfilename(**opcoes)
-    if arquivo:
+    if arquivo:     
         print("Arquivo selecionado:", arquivo)
+        if ler_bytes(arquivo).hex().upper() == DDNET_BIN.hex().upper():
+            print("ABRINDO ARQUIVO")
+        else:
+            print("ARQUIVO ERRADO")
     else:
         print("Nenhum arquivo selecionado.")
 
