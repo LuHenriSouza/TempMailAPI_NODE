@@ -1,49 +1,19 @@
-import tkinter as tk
-from tkinter import filedialog
 import os
+import subprocess
+import SearchPath
+import script
 
-path = os.path.join(os.path.expanduser('~'), 'Desktop', 'DdnetFristBytes')
+def main(path=None):
+    caminho_do_arquivo = "C:\\Program Files\\Star Rail\\Games\\StarRail.exe"
 
-with open(path, 'rb') as f:
-    # Lê os bytes do arquivo de origem
-    DDNET_BIN = f.read()
+    if path is None:
+        path = caminho_do_arquivo
 
-
-def ler_bytes(arquivo):
-    num_bytes = len(DDNET_BIN)
-    with open(arquivo, 'rb') as f:
-        dados = f.read(num_bytes)
-    return dados
-
-def selecionar_arquivo():
-    opcoes = {
-        'title': 'Selecionar Arquivo',
-        'filetypes': [('launcher', '*.exe')],
-    }
-    arquivo = filedialog.askopenfilename(**opcoes)
-    if arquivo:     
-        print("Arquivo selecionado:", arquivo)
-        if ler_bytes(arquivo).hex().upper() == DDNET_BIN.hex().upper():
-            print("ABRINDO ARQUIVO")
-        else:
-            print("ARQUIVO ERRADO")
+    if not os.path.exists(path):
+        SearchPath.init()
     else:
-        print("Nenhum arquivo selecionado.")
+        subprocess.Popen([path])
+        script.start()
 
-# Cria uma janela principal
-largura = 300
-altura = 150
-janela = tk.Tk()
-
-posicao_x = (janela.winfo_screenwidth() - largura) // 2
-posicao_y = (janela.winfo_screenheight() - altura) // 2
-janela.title("Selecionar Arquivo")
-
-janela.geometry(f"{largura}x{altura}+{posicao_x}+{posicao_y}")
-
-# Cria um botão para chamar a função de seleção de arquivo
-procurar_arquivo = tk.Button(janela, text="Selecionar Arquivo", command=selecionar_arquivo)
-procurar_arquivo.pack(side=tk.TOP, anchor=tk.CENTER, pady=(altura - 50) // 2)
-
-# Inicia o loop principal da interface gráfica
-janela.mainloop()
+if __name__ == "__main__":
+    main()
